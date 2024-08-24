@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,6 +30,9 @@ public class OrderSesrviceImpl implements OrderService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private Environment environment;
 
     @Override
     public List<Order> getOrders() {
@@ -61,7 +65,9 @@ public class OrderSesrviceImpl implements OrderService {
             });
 
             // Update stock in elastic
-            String url = "http://localhost:8082/elastic/products/stock";
+            String baseUrl = environment.getProperty("MS_SEARCH_URL");
+            // String url = "http://localhost:8082/elastic/products/stock";
+            String url = baseUrl + "/elastic/products/stock";
             restTemplate.postForObject(url, bodyStock, Product[].class);
 
             // Print products in order
@@ -100,8 +106,10 @@ public class OrderSesrviceImpl implements OrderService {
             List<String> productsCode = orderProducts.isEmpty() ? null
                     : orderProducts.stream().map(op -> op.getId().getProductCode())
                             .toList();
+            String baseUrl = environment.getProperty("MS_SEARCH_URL");
             List<Product> products = productsCode.stream().map(productCode -> {
-                String url = "http://localhost:8082/elastic/products/" + productCode + "/details";
+                // String url = "http://localhost:8082/elastic/products/" + productCode + "/details";
+                String url = baseUrl + "/elastic/products/" + productCode + "/details";
                 return restTemplate.getForObject(url, Product.class);
             }).toList();
 
