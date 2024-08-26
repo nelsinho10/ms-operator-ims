@@ -81,6 +81,27 @@ public class OrderSesrviceImpl implements OrderService {
     }
 
     @Override
+    public List<Product> getProductsByOrderId(Long id) {
+
+        if (id != null) {
+            List<OrderProduct> orderProducts = orderProductRepository.findByOrderId(id);
+            List<String> productsCode = orderProducts.isEmpty() ? null
+                    : orderProducts.stream().map(op -> op.getId().getProductCode())
+                            .toList();
+            String baseUrl = environment.getProperty("MS_SEARCH_URL");
+            List<Product> products = productsCode.stream().map(productCode -> {
+                // String url = "http://localhost:8082/elastic/products/" + productCode +
+                // "/details";
+                String url = baseUrl + "/elastic/products/" + productCode + "/details";
+                return restTemplate.getForObject(url, Product.class);
+            }).toList();
+
+            return products;
+        }
+        return null;
+    }
+
+    @Override
     public Order updateOrder(Long id, Order order) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateOrder'");
@@ -96,26 +117,6 @@ public class OrderSesrviceImpl implements OrderService {
     public Boolean changeStatus(Long id, Boolean status) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'changeStatus'");
-    }
-
-    @Override
-    public List<Product> getProductsByOrderId(Long id) {
-
-        if (id != null) {
-            List<OrderProduct> orderProducts = orderProductRepository.findByOrderId(id);
-            List<String> productsCode = orderProducts.isEmpty() ? null
-                    : orderProducts.stream().map(op -> op.getId().getProductCode())
-                            .toList();
-            String baseUrl = environment.getProperty("MS_SEARCH_URL");
-            List<Product> products = productsCode.stream().map(productCode -> {
-                // String url = "http://localhost:8082/elastic/products/" + productCode + "/details";
-                String url = baseUrl + "/elastic/products/" + productCode + "/details";
-                return restTemplate.getForObject(url, Product.class);
-            }).toList();
-
-            return products;
-        }
-        return null;
     }
 
     @Override

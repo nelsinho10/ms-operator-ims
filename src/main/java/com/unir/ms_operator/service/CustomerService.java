@@ -11,4 +11,5 @@ public interface CustomerService {
     Customer createCustomer(CreateCustomerRequest request);
     Customer updateCustomer(Long id, Customer customer);
     Boolean deleteCustomer(Long id);
+    List<Customer> searchCustomer(String name);
 }

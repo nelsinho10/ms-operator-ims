@@ -24,8 +24,7 @@ public class CustomersServiceImpl implements CustomerService {
 
     @Override
     public Customer getCustomer(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCustomer'");
+        return customerRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -47,14 +46,31 @@ public class CustomersServiceImpl implements CustomerService {
 
     @Override
     public Customer updateCustomer(Long id, Customer customer) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateCustomer'");
+        if (customerRepository.existsById(id)) {
+            customer.setId(id);
+            return customerRepository.save(customer);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public Boolean deleteCustomer(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteCustomer'");
+       if (customerRepository.existsById(id)) {
+            customerRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public List<Customer> searchCustomer(String name) {
+       if (StringUtils.hasLength(name.trim())) {
+            return customerRepository.findByNameContaining(name);
+        } else {
+            return null;
+        }
     }
 
 }
